@@ -4,7 +4,6 @@ interface Ripple {
   x: number;
   y: number;
   birth: number;
-  strength: number;
 }
 
 const WaveNetwork = () => {
@@ -20,10 +19,8 @@ const WaveNetwork = () => {
       x: e.clientX,
       y: e.clientY,
       birth: timeRef.current,
-      strength: 1,
     });
-    // Keep max 5 ripples
-    if (ripplesRef.current.length > 5) ripplesRef.current.shift();
+    if (ripplesRef.current.length > 4) ripplesRef.current.shift();
   }, []);
 
   useEffect(() => {
@@ -48,152 +45,144 @@ const WaveNetwork = () => {
       mouseRef.current = { x: -9999, y: -9999 };
     };
 
+    // Grid parameters
+    const gridSpacing = 22;
+    const cols = 100;
+    const rows = 60;
+
     const animate = () => {
       const w = window.innerWidth;
       const h = window.innerHeight;
       ctx.clearRect(0, 0, w, h);
 
-      timeRef.current += 0.001;
+      timeRef.current += 0.015;
       const t = timeRef.current;
       const mouse = mouseRef.current;
       const smooth = smoothMouseRef.current;
 
-      // Smooth mouse follow — gives a laggy, luxurious feel
-      smooth.x += (mouse.x - smooth.x) * 0.06;
-      smooth.y += (mouse.y - smooth.y) * 0.06;
-
-      const mouseRadius = 250;
-      const spacing = 28; // Grid cell size
-      const cols = Math.ceil(w / spacing) + 2;
-      const rows = Math.ceil(h / spacing) + 2;
-
-      // Precompute displaced grid intersections
-      const getDisplacement = (gx: number, gy: number): [number, number] => {
-        let dx = 0;
-        let dy = 0;
-
-        // Mouse warp — fabric stretches toward cursor
-        const mx = gx - smooth.x;
-        const my = gy - smooth.y;
-        const mDist = Math.sqrt(mx * mx + my * my);
-        if (mDist < mouseRadius && mDist > 0) {
-          const force = 1 - mDist / mouseRadius;
-          const smooth3 = force * force * force;
-          dx += (mx / mDist) * smooth3 * -35;
-          dy += (my / mDist) * smooth3 * -35;
-        }
-
-        // Click ripples
-        for (const ripple of ripplesRef.current) {
-          const age = (t - ripple.birth) * 200;
-          const rx = gx - ripple.x;
-          const ry = gy - ripple.y;
-          const rDist = Math.sqrt(rx * rx + ry * ry);
-          const waveRadius = age * 2.5;
-          const ringDist = Math.abs(rDist - waveRadius);
-          const ringWidth = 120;
-
-          if (ringDist < ringWidth) {
-            const fade = Math.max(0, 1 - age / 600);
-            const ringForce = (1 - ringDist / ringWidth) * fade * ripple.strength;
-            const angle = Math.atan2(ry, rx);
-            const displacement = Math.sin(ringDist * 0.06) * ringForce * 30;
-            dx += Math.cos(angle) * displacement;
-            dy += Math.sin(angle) * displacement;
-          }
-        }
-
-        return [dx, dy];
-      };
-
-      // === Draw horizontal lines ===
-      for (let row = -1; row <= rows; row++) {
-        const baseY = row * spacing;
-        const edgeDist = Math.abs((baseY / h) - 0.5) * 2;
-        const baseAlpha = 0.12 + edgeDist * 0.15;
-
-        ctx.beginPath();
-        let started = false;
-        for (let col = -1; col <= cols; col++) {
-          const baseX = col * spacing;
-          const [dx, dy] = getDisplacement(baseX, baseY);
-
-          if (!started) {
-            ctx.moveTo(baseX + dx, baseY + dy);
-            started = true;
-          } else {
-            ctx.lineTo(baseX + dx, baseY + dy);
-          }
-        }
-
-        // Mouse proximity glow
-        const rowDist = Math.abs(baseY - smooth.y);
-        const glow = rowDist < mouseRadius
-          ? (1 - rowDist / mouseRadius) * 0.3
-          : 0;
-
-        ctx.strokeStyle = `rgba(200, 50, 50, ${baseAlpha + glow})`;
-        ctx.lineWidth = 0.6 + glow * 1.5;
-        ctx.stroke();
+      // Smooth mouse
+      if (mouse.x > 0) {
+        smooth.x += (mouse.x - smooth.x) * 0.05;
+        smooth.y += (mouse.y - smooth.y) * 0.05;
       }
 
-      // === Draw vertical lines ===
-      for (let col = -1; col <= cols; col++) {
-        const baseX = col * spacing;
-        const edgeDist = Math.abs((baseX / w) - 0.5) * 2;
-        const baseAlpha = 0.12 + edgeDist * 0.15;
+      // Focal point follows mouse (or defaults to center)
+      const focalX = smooth.x > 0 ? smooth.x : w / 2;
+      const focalY = smooth.y > 0 ? smooth.y : h / 2;
 
-        ctx.beginPath();
-        let started = false;
-        for (let row = -1; row <= rows; row++) {
-          const baseY = row * spacing;
-          const [dx, dy] = getDisplacement(baseX, baseY);
+      // 3D perspective parameters
+      const vanishY = h * 0.45; // horizon line
+      const eyeHeight = 300;
+      const perspectiveStrength = 600;
 
-          if (!started) {
-            ctx.moveTo(baseX + dx, baseY + dy);
-            started = true;
-          } else {
-            ctx.lineTo(baseX + dx, baseY + dy);
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          // Grid position in world space (centered)
+          const worldX = (col - cols / 2) * gridSpacing;
+          const worldZ = row * gridSpacing + 20;
+
+          // Wave displacement in Y (height)
+          const distFromFocalWorld = Math.sqrt(
+            (worldX - (focalX - w / 2)) ** 2 + (worldZ - (focalY - vanishY + 200)) ** 2
+          );
+
+          // Concentric waves from focal point
+          let waveY = Math.sin(distFromFocalWorld * 0.04 - t * 2) * 15 *
+            Math.max(0, 1 - distFromFocalWorld / 800);
+
+          // Ambient flowing wave
+          waveY += Math.sin(worldX * 0.02 + t * 0.5) * 4;
+          waveY += Math.sin(worldZ * 0.015 + t * 0.3) * 3;
+
+          // Click ripples
+          for (const ripple of ripplesRef.current) {
+            const age = t - ripple.birth;
+            const rippleDist = Math.sqrt(
+              (worldX - (ripple.x - w / 2)) ** 2 +
+              (worldZ - (ripple.y - vanishY + 200)) ** 2
+            );
+            const waveRadius = age * 150;
+            const ringDist = Math.abs(rippleDist - waveRadius);
+            const ringWidth = 100;
+            if (ringDist < ringWidth) {
+              const fade = Math.max(0, 1 - age / 3);
+              const ringForce = (1 - ringDist / ringWidth) * fade;
+              waveY += Math.sin(ringDist * 0.06) * ringForce * 25;
+            }
           }
-        }
 
-        const colDist = Math.abs(baseX - smooth.x);
-        const glow = colDist < mouseRadius
-          ? (1 - colDist / mouseRadius) * 0.3
-          : 0;
+          // Project 3D → 2D with perspective
+          const worldYPos = -waveY;
+          const scale = perspectiveStrength / (worldZ + perspectiveStrength);
+          const screenX = w / 2 + worldX * scale;
+          const screenY = vanishY + (worldYPos + eyeHeight) * scale;
 
-        ctx.strokeStyle = `rgba(200, 50, 50, ${baseAlpha + glow})`;
-        ctx.lineWidth = 0.6 + glow * 1.5;
-        ctx.stroke();
-      }
+          // Skip if off screen
+          if (screenX < -20 || screenX > w + 20 || screenY < -20 || screenY > h + 20) continue;
 
-      // === Subtle intersection dots near mouse ===
-      for (let row = 0; row <= rows; row++) {
-        for (let col = 0; col <= cols; col++) {
-          const baseX = col * spacing;
-          const baseY = row * spacing;
-          const mx = baseX - smooth.x;
-          const my = baseY - smooth.y;
-          const mDist = Math.sqrt(mx * mx + my * my);
+          // Distance from focal for glow
+          const screenDx = screenX - focalX;
+          const screenDy = screenY - focalY;
+          const screenDist = Math.sqrt(screenDx * screenDx + screenDy * screenDy);
 
-          if (mDist < mouseRadius * 0.7) {
-            const [dx, dy] = getDisplacement(baseX, baseY);
-            const force = 1 - mDist / (mouseRadius * 0.7);
-            const dotAlpha = force * force * 0.5;
-            const dotSize = 1.5 + force * 2.5;
+          // Depth-based properties
+          const depthFade = Math.min(1, scale * 1.8);
+          const baseSize = Math.max(0.5, 2.5 * scale);
 
+          // Focal glow boost
+          const focalRadius = 250;
+          const focalBoost = screenDist < focalRadius
+            ? (1 - screenDist / focalRadius)
+            : 0;
+
+          const dotSize = baseSize + focalBoost * 2.5 * scale;
+          const dotAlpha = depthFade * (0.12 + focalBoost * 0.55);
+
+          // Color: red core, softer rose at distance
+          const r = 200 + focalBoost * 30;
+          const g = 40 + (1 - focalBoost) * 30;
+          const b = 40 + (1 - focalBoost) * 40;
+
+          // Glow halo for close-to-focal dots
+          if (focalBoost > 0.3 && depthFade > 0.3) {
+            const glowSize = dotSize * 4;
+            const gradient = ctx.createRadialGradient(
+              screenX, screenY, 0,
+              screenX, screenY, glowSize
+            );
+            gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${focalBoost * depthFade * 0.15})`);
+            gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
             ctx.beginPath();
-            ctx.arc(baseX + dx, baseY + dy, dotSize, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(210, 48, 48, ${dotAlpha})`;
+            ctx.arc(screenX, screenY, glowSize, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
             ctx.fill();
           }
+
+          // Core dot
+          ctx.beginPath();
+          ctx.arc(screenX, screenY, dotSize, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${dotAlpha})`;
+          ctx.fill();
         }
       }
 
-      // Clean up expired ripples
-      ripplesRef.current = ripplesRef.current.filter(
-        r => (t - r.birth) * 200 < 600
-      );
+      // Central glow aura at focal point
+      if (smooth.x > 0) {
+        const gradient = ctx.createRadialGradient(
+          focalX, focalY, 0,
+          focalX, focalY, 180
+        );
+        gradient.addColorStop(0, "rgba(210, 48, 48, 0.06)");
+        gradient.addColorStop(0.4, "rgba(210, 48, 48, 0.02)");
+        gradient.addColorStop(1, "rgba(210, 48, 48, 0)");
+        ctx.beginPath();
+        ctx.arc(focalX, focalY, 180, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+      }
+
+      // Cleanup ripples
+      ripplesRef.current = ripplesRef.current.filter(r => t - r.birth < 3);
 
       animRef.current = requestAnimationFrame(animate);
     };
