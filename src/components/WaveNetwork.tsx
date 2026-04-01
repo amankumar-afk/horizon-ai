@@ -43,8 +43,8 @@ const WaveNetwork = () => {
     };
 
     const COLS = 160;
-    const ROWS = 80;
-    const SPACING = 14;
+    const ROWS = 140;
+    const SPACING = 12;
 
     const startTime = performance.now();
 
