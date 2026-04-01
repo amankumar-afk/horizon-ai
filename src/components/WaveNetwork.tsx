@@ -125,21 +125,21 @@ const WaveNetwork = () => {
           const screenDist = Math.sqrt(screenDx * screenDx + screenDy * screenDy);
 
           // Depth-based properties
-          const depthFade = Math.min(1, scale * 3);
-          const baseSize = Math.max(1, 4.5 * scale);
+          const depthFade = Math.min(1, scale * 3.5);
+          const baseSize = Math.max(0.6, 2 * scale);
 
-          // Bottom-edge boost: dots near bottom of screen get bolder
-          const bottomProximity = Math.max(0, (screenY - h * 0.5) / (h * 0.5));
-          const bottomBoost = bottomProximity * bottomProximity;
+          // Bottom-edge boost
+          const bottomProximity = Math.max(0, (screenY - h * 0.3) / (h * 0.7));
+          const bottomBoost = bottomProximity;
 
           // Focal glow boost
-          const focalRadius = 280;
+          const focalRadius = 250;
           const focalBoost = screenDist < focalRadius
             ? (1 - screenDist / focalRadius)
             : 0;
 
-          const dotSize = baseSize * (1 + bottomBoost * 0.8) + focalBoost * 4 * scale;
-          const dotAlpha = depthFade * (0.2 + bottomBoost * 0.35 + focalBoost * 0.5);
+          const dotSize = baseSize * (1 + bottomBoost * 0.5) + focalBoost * 2 * scale;
+          const dotAlpha = depthFade * (0.25 + bottomBoost * 0.45 + focalBoost * 0.4);
 
           // Color: red core, softer rose at distance
           const r = 200 + focalBoost * 30;
