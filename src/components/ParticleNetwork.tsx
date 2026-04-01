@@ -65,10 +65,10 @@ const ParticleNetwork = () => {
           y,
           baseX: x,
           baseY: y,
-          vx: (Math.random() - 0.5) * 0.3,
-          vy: (Math.random() - 0.5) * 0.3,
-          radius: Math.random() * 2 + 1,
-          opacity: Math.random() * 0.5 + 0.1,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          radius: Math.random() * 2.5 + 1.2,
+          opacity: Math.random() * 0.6 + 0.15,
         });
       }
       particlesRef.current = particles;
