@@ -1,4 +1,4 @@
-import ParticleNetwork from "@/components/ParticleNetwork";
+import WaveNetwork from "@/components/WaveNetwork";
 import LoginCard from "@/components/LoginCard";
 import logo from "@/assets/dotpe-horizon-logo.svg";
 
