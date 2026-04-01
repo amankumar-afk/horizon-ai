@@ -71,9 +71,9 @@ const WaveNetwork = () => {
       const focalY = smooth.y > 0 ? smooth.y : h / 2;
 
       // 3D perspective parameters
-      const vanishY = h * 0.15;
-      const eyeHeight = 250;
-      const perspectiveStrength = 400;
+      const vanishY = h * 0.5;
+      const eyeHeight = 180;
+      const perspectiveStrength = 300;
 
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
