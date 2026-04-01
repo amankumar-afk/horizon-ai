@@ -83,42 +83,7 @@ const WaveNetwork = () => {
         ctx.stroke();
       }
 
-      // === Vertical parallel lines ===
-      const vCount = 20;
-      const vSpacing = w / (vCount - 1);
 
-      for (let i = 0; i < vCount; i++) {
-        const baseX = i * vSpacing;
-        const edgeDist = Math.abs(i / (vCount - 1) - 0.5) * 2;
-        const lineAlpha = 0.06 + edgeDist * 0.12;
-        const lineWidth = 0.5 + edgeDist * 0.7;
-
-        ctx.beginPath();
-        for (let y = -10; y <= h + 10; y += 4) {
-          let x = baseX;
-
-          const dx = baseX - mouse.x;
-          const dy = y - mouse.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < mouseRadius) {
-            const force = 1 - dist / mouseRadius;
-            const smooth = force * force * (3 - 2 * force);
-            x += Math.sin(y * 0.025 + t * 3) * smooth * 18;
-            x += Math.sin(y * 0.06 + t * 5) * smooth * 6;
-            x += (dx > 0 ? 1 : -1) * smooth * 12;
-          }
-
-          if (y === -10) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-
-        const waveDist = Math.abs(baseX - mouse.x);
-        const glow = waveDist < mouseRadius ? (1 - waveDist / mouseRadius) * 0.2 : 0;
-
-        ctx.strokeStyle = `rgba(210, 60, 60, ${lineAlpha + glow})`;
-        ctx.lineWidth = lineWidth + glow * 1;
-        ctx.stroke();
-      }
 
       // === Subtle focus ring around cursor ===
       if (mouse.x > 0 && mouse.y > 0) {
