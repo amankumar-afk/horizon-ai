@@ -124,8 +124,8 @@ const WaveNetwork = () => {
           const depthFade = Math.min(1, scale * 3.5);
           const baseSize = Math.max(0.6, 2 * scale);
 
-          // Bottom-edge boost
-          const bottomProximity = Math.max(0, (screenY - h * 0.3) / (h * 0.7));
+          // Bottom-edge boost: dots near bottom are closer/bolder
+          const bottomProximity = Math.max(0, screenY - h * 0.4) / (h * 0.6);
           const bottomBoost = bottomProximity;
 
           // Focal glow boost
