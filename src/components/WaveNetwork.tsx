@@ -47,8 +47,8 @@ const WaveNetwork = () => {
 
     // Grid parameters
     const gridSpacing = 22;
-    const cols = 100;
-    const rows = 60;
+    const cols = 120;
+    const rows = 90;
 
     const animate = () => {
       const w = window.innerWidth;
@@ -71,9 +71,9 @@ const WaveNetwork = () => {
       const focalY = smooth.y > 0 ? smooth.y : h / 2;
 
       // 3D perspective parameters
-      const vanishY = h * 0.45; // horizon line
-      const eyeHeight = 300;
-      const perspectiveStrength = 600;
+      const vanishY = h * 0.15;
+      const eyeHeight = 250;
+      const perspectiveStrength = 400;
 
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
