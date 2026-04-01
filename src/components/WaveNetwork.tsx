@@ -71,9 +71,9 @@ const WaveNetwork = () => {
       const focalY = smooth.y > 0 ? smooth.y : h / 2;
 
       // 3D perspective parameters
-      const vanishY = h * 0.15;
-      const eyeHeight = 250;
-      const perspectiveStrength = 400;
+      const vanishY = h * 0.5;
+      const eyeHeight = 180;
+      const perspectiveStrength = 300;
 
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
@@ -126,8 +126,8 @@ const WaveNetwork = () => {
           const screenDist = Math.sqrt(screenDx * screenDx + screenDy * screenDy);
 
           // Depth-based properties
-          const depthFade = Math.min(1, scale * 1.8);
-          const baseSize = Math.max(0.5, 2.5 * scale);
+          const depthFade = Math.min(1, scale * 2.5);
+          const baseSize = Math.max(0.8, 3.5 * scale);
 
           // Focal glow boost
           const focalRadius = 250;
@@ -135,8 +135,8 @@ const WaveNetwork = () => {
             ? (1 - screenDist / focalRadius)
             : 0;
 
-          const dotSize = baseSize + focalBoost * 2.5 * scale;
-          const dotAlpha = depthFade * (0.12 + focalBoost * 0.55);
+          const dotSize = baseSize + focalBoost * 3.5 * scale;
+          const dotAlpha = depthFade * (0.2 + focalBoost * 0.6);
 
           // Color: red core, softer rose at distance
           const r = 200 + focalBoost * 30;
