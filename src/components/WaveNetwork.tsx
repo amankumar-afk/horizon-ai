@@ -127,60 +127,6 @@ const WaveNetwork = () => {
         ctx.stroke();
       }
 
-      // === LAYER 3: Data pulse nodes — floating analytics dots ===
-      for (const node of dataNodes) {
-        const pulse = Math.sin(t * node.pulseSpeed + node.phase);
-        const size = node.size + pulse * 0.8;
-        const alpha = 0.06 + pulse * 0.04;
-
-        // Gentle float
-        const fx = node.x + Math.sin(t * 0.3 + node.phase) * 15;
-        const fy = node.y + Math.cos(t * 0.2 + node.phase * 1.3) * 10;
-
-        // Mouse proximity boost
-        const dx = fx - mouse.x;
-        const dy = fy - mouse.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const mouseBoost = dist < mouseRadius ? (1 - dist / mouseRadius) : 0;
-
-        const finalAlpha = Math.min(alpha + mouseBoost * 0.3, 0.5);
-        const finalSize = size + mouseBoost * 3;
-
-        // Outer glow
-        if (mouseBoost > 0.1) {
-          const gradient = ctx.createRadialGradient(fx, fy, 0, fx, fy, finalSize * 4);
-          gradient.addColorStop(0, `rgba(210, 48, 48, ${mouseBoost * 0.15})`);
-          gradient.addColorStop(1, `rgba(210, 48, 48, 0)`);
-          ctx.beginPath();
-          ctx.arc(fx, fy, finalSize * 4, 0, Math.PI * 2);
-          ctx.fillStyle = gradient;
-          ctx.fill();
-        }
-
-        // Core dot
-        ctx.beginPath();
-        ctx.arc(fx, fy, finalSize, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(210, 48, 48, ${finalAlpha})`;
-        ctx.fill();
-
-        // Connect nearby nodes near mouse
-        if (mouseBoost > 0.2) {
-          for (const other of dataNodes) {
-            if (other === node) continue;
-            const ox = other.x + Math.sin(t * 0.3 + other.phase) * 15;
-            const oy = other.y + Math.cos(t * 0.2 + other.phase * 1.3) * 10;
-            const nd = Math.sqrt((fx - ox) ** 2 + (fy - oy) ** 2);
-            if (nd < 150) {
-              ctx.beginPath();
-              ctx.moveTo(fx, fy);
-              ctx.lineTo(ox, oy);
-              ctx.strokeStyle = `rgba(210, 48, 48, ${mouseBoost * 0.08 * (1 - nd / 150)})`;
-              ctx.lineWidth = 0.5;
-              ctx.stroke();
-            }
-          }
-        }
-      }
 
       // === LAYER 4: Mouse focus ring — "analytical lens" ===
       if (mouse.x > 0 && mouse.y > 0) {
