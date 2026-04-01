@@ -176,11 +176,11 @@ const WaveNetwork = () => {
           const my = baseY - smooth.y;
           const mDist = Math.sqrt(mx * mx + my * my);
 
-          if (mDist < mouseRadius * 0.6) {
+          if (mDist < mouseRadius * 0.7) {
             const [dx, dy] = getDisplacement(baseX, baseY);
-            const force = 1 - mDist / (mouseRadius * 0.6);
-            const dotAlpha = force * force * 0.3;
-            const dotSize = 1 + force * 1.5;
+            const force = 1 - mDist / (mouseRadius * 0.7);
+            const dotAlpha = force * force * 0.5;
+            const dotSize = 1.5 + force * 2.5;
 
             ctx.beginPath();
             ctx.arc(baseX + dx, baseY + dy, dotSize, 0, Math.PI * 2);
