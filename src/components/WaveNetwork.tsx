@@ -45,10 +45,9 @@ const WaveNetwork = () => {
       mouseRef.current = { x: -9999, y: -9999 };
     };
 
-    // Grid parameters
-    const gridSpacing = 22;
-    const cols = 120;
-    const rows = 90;
+    const gridSpacing = 20;
+    const cols = 140;
+    const rows = 120;
 
     const animate = () => {
       const w = window.innerWidth;
