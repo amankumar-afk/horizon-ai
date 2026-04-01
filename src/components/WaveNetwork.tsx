@@ -45,8 +45,8 @@ const WaveNetwork = () => {
       for (let i = 0; i < hCount; i++) {
         const baseY = i * hSpacing;
         const edgeDist = Math.abs(i / (hCount - 1) - 0.5) * 2;
-        const lineAlpha = 0.04 + edgeDist * 0.12;
-        const lineWidth = 0.4 + edgeDist * 0.7;
+        const lineAlpha = 0.1 + edgeDist * 0.2;
+        const lineWidth = 0.7 + edgeDist * 1.2;
 
         ctx.beginPath();
         for (let x = -10; x <= w + 10; x += 3) {
@@ -71,12 +71,12 @@ const WaveNetwork = () => {
         }
 
         const waveDist = Math.abs(baseY - mouse.y);
-        const glow = waveDist < mouseRadius ? (1 - waveDist / mouseRadius) * 0.2 : 0;
+        const glow = waveDist < mouseRadius ? (1 - waveDist / mouseRadius) * 0.35 : 0;
 
         const r = 210 - edgeDist * 30;
         const g = 48 + (1 - edgeDist) * 40;
         const b = 48 + (1 - edgeDist) * 50;
-        const alpha = Math.min(lineAlpha + glow, 0.4);
+        const alpha = Math.min(lineAlpha + glow, 0.6);
 
         ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
         ctx.lineWidth = lineWidth + glow * 1.5;
@@ -90,8 +90,8 @@ const WaveNetwork = () => {
       for (let i = 0; i < vCount; i++) {
         const baseX = i * vSpacing;
         const edgeDist = Math.abs(i / (vCount - 1) - 0.5) * 2;
-        const lineAlpha = 0.02 + edgeDist * 0.05;
-        const lineWidth = 0.3 + edgeDist * 0.4;
+        const lineAlpha = 0.06 + edgeDist * 0.12;
+        const lineWidth = 0.5 + edgeDist * 0.7;
 
         ctx.beginPath();
         for (let y = -10; y <= h + 10; y += 4) {
@@ -113,7 +113,7 @@ const WaveNetwork = () => {
         }
 
         const waveDist = Math.abs(baseX - mouse.x);
-        const glow = waveDist < mouseRadius ? (1 - waveDist / mouseRadius) * 0.1 : 0;
+        const glow = waveDist < mouseRadius ? (1 - waveDist / mouseRadius) * 0.2 : 0;
 
         ctx.strokeStyle = `rgba(210, 60, 60, ${lineAlpha + glow})`;
         ctx.lineWidth = lineWidth + glow * 1;
