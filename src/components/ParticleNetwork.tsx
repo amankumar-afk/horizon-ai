@@ -59,16 +59,15 @@ const ParticleNetwork = () => {
           const maxDist = Math.sqrt(cx * cx + cy * cy);
           const centerFactor = distToCenter / maxDist;
           
-          // Skip some nodes near center to keep it airy
-          if (centerFactor < 0.25 && Math.random() > 0.3) continue;
-          if (centerFactor < 0.4 && Math.random() > 0.6) continue;
+          // Skip fewer nodes near center
+          if (centerFactor < 0.2 && Math.random() > 0.5) continue;
 
           nodes.push({
             x: jx, y: jy,
             originX: jx, originY: jy,
             vx: 0, vy: 0,
-            radius: 1.2 + Math.random() * 1.3,
-            opacity: 0.08 + centerFactor * 0.35,
+            radius: 1.8 + Math.random() * 1.8,
+            opacity: 0.2 + centerFactor * 0.45,
             pulsePhase: Math.random() * Math.PI * 2,
             pulseSpeed: 0.3 + Math.random() * 0.5,
           });
@@ -136,15 +135,15 @@ const ParticleNetwork = () => {
 
         // Pulsing glow near mouse
         const pulse = Math.sin(t * 3 + n.pulsePhase) * 0.5 + 0.5;
-        const drawOpacity = (n.opacity + mouseInfluence * 0.5 + pulse * mouseInfluence * 0.2) * globalAlpha;
-        const drawRadius = n.radius + mouseInfluence * 2;
+        const drawOpacity = (n.opacity + mouseInfluence * 0.6 + pulse * mouseInfluence * 0.3) * globalAlpha;
+        const drawRadius = n.radius + mouseInfluence * 3;
 
         // Draw node with glow
         if (mouseInfluence > 0.3) {
           ctx.beginPath();
           ctx.arc(n.x, n.y, drawRadius * 3, 0, Math.PI * 2);
           const glow = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, drawRadius * 3);
-          glow.addColorStop(0, `rgba(210, 48, 48, ${drawOpacity * 0.15})`);
+          glow.addColorStop(0, `rgba(210, 48, 48, ${drawOpacity * 0.25})`);
           glow.addColorStop(1, `rgba(210, 48, 48, 0)`);
           ctx.fillStyle = glow;
           ctx.fill();
@@ -175,19 +174,19 @@ const ParticleNetwork = () => {
           const mdx = mouse.x - midX;
           const mdy = mouse.y - midY;
           const mDist = Math.sqrt(mdx * mdx + mdy * mdy);
-          const mouseBoost = mDist < mouseRadius ? (mouseRadius - mDist) / mouseRadius * 0.25 : 0;
+          const mouseBoost = mDist < mouseRadius ? (mouseRadius - mDist) / mouseRadius * 0.4 : 0;
 
           // Traveling pulse along line
           const pulseT = (Math.sin(t * 1.5 + i * 0.03 + j * 0.02) + 1) * 0.5;
           const hasPulse = pulseT > 0.92;
 
-          const lineOpacity = (falloff * 0.1 + mouseBoost + (hasPulse ? 0.12 : 0)) * globalAlpha;
+          const lineOpacity = (falloff * 0.2 + mouseBoost + (hasPulse ? 0.15 : 0)) * globalAlpha;
 
           ctx.beginPath();
           ctx.moveTo(a.x, a.y);
           ctx.lineTo(b.x, b.y);
           ctx.strokeStyle = `rgba(210, 48, 48, ${lineOpacity})`;
-          ctx.lineWidth = hasPulse ? 1.2 : 0.5;
+          ctx.lineWidth = hasPulse ? 1.5 : 0.8;
           ctx.stroke();
 
           // Draw traveling pulse dot
