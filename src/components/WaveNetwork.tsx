@@ -192,7 +192,7 @@ const WaveNetwork = () => {
 
       // Clean up expired ripples
       ripplesRef.current = ripplesRef.current.filter(
-        r => (t - r.birth) * 300 < 400
+        r => (t - r.birth) * 200 < 600
       );
 
       animRef.current = requestAnimationFrame(animate);
