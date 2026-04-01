@@ -78,9 +78,9 @@ const WaveNetwork = () => {
         const mDist = Math.sqrt(mx * mx + my * my);
         if (mDist < mouseRadius && mDist > 0) {
           const force = 1 - mDist / mouseRadius;
-          const smooth3 = force * force * force; // cubic ease — very gentle at edges
-          dx += (mx / mDist) * smooth3 * -18;
-          dy += (my / mDist) * smooth3 * -18;
+          const smooth3 = force * force * force;
+          dx += (mx / mDist) * smooth3 * -35;
+          dy += (my / mDist) * smooth3 * -35;
         }
 
         // Click ripples
