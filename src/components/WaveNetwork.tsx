@@ -95,14 +95,14 @@ const WaveNetwork = () => {
         ctx.stroke();
       }
 
-      // === LAYER 2: Meridian lines (vertical, like grid references) ===
-      const meridianCount = 8;
+      // === LAYER 2: Meridian lines (vertical, denser) ===
+      const meridianCount = 16;
       for (let i = 0; i < meridianCount; i++) {
         const baseX = ((i + 0.5) / meridianCount) * w;
         const edgeDist = Math.abs((i + 0.5) / meridianCount - 0.5) * 2;
-        const alpha = 0.015 + edgeDist * 0.04;
+        const alpha = 0.02 + edgeDist * 0.06;
         const freq = 0.006 + Math.cos(i * 1.1) * 0.002;
-        const amp = 6 + edgeDist * 12;
+        const amp = 8 + edgeDist * 14;
         const phase = i * 1.2 + t * 0.4;
 
         ctx.beginPath();
