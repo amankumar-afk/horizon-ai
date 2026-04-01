@@ -174,7 +174,7 @@ const ParticleNetwork = () => {
           const mdx = mouse.x - midX;
           const mdy = mouse.y - midY;
           const mDist = Math.sqrt(mdx * mdx + mdy * mdy);
-          const mouseBoost = mDist < mouseRadius ? (mouseRadius - mDist) / mouseRadius * 0.25 : 0;
+          const mouseBoost = mDist < mouseRadius ? (mouseRadius - mDist) / mouseRadius * 0.4 : 0;
 
           // Traveling pulse along line
           const pulseT = (Math.sin(t * 1.5 + i * 0.03 + j * 0.02) + 1) * 0.5;
