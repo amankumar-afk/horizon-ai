@@ -76,7 +76,7 @@ const WaveNetwork = () => {
         const r = 210 - edgeDist * 30;
         const g = 48 + (1 - edgeDist) * 40;
         const b = 48 + (1 - edgeDist) * 50;
-        const alpha = Math.min(lineAlpha + glow, 0.4);
+        const alpha = Math.min(lineAlpha + glow, 0.6);
 
         ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
         ctx.lineWidth = lineWidth + glow * 1.5;
