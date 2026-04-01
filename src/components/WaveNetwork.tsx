@@ -28,17 +28,7 @@ const WaveNetwork = () => {
       mouseRef.current = { x: -9999, y: -9999 };
     };
 
-    // Data-inspired "pulse" nodes — like data points on a chart
-    const dataNodes: { x: number; y: number; phase: number; size: number; pulseSpeed: number }[] = [];
-    for (let i = 0; i < 40; i++) {
-      dataNodes.push({
-        x: Math.random() * window.innerWidth,
-        y: Math.random() * window.innerHeight,
-        phase: Math.random() * Math.PI * 2,
-        size: 1.5 + Math.random() * 2.5,
-        pulseSpeed: 0.5 + Math.random() * 1.5,
-      });
-    }
+
 
     const animate = () => {
       const w = window.innerWidth;
