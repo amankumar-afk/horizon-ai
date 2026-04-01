@@ -45,8 +45,8 @@ const WaveNetwork = () => {
       for (let i = 0; i < hCount; i++) {
         const baseY = i * hSpacing;
         const edgeDist = Math.abs(i / (hCount - 1) - 0.5) * 2;
-        const lineAlpha = 0.04 + edgeDist * 0.12;
-        const lineWidth = 0.4 + edgeDist * 0.7;
+        const lineAlpha = 0.1 + edgeDist * 0.2;
+        const lineWidth = 0.7 + edgeDist * 1.2;
 
         ctx.beginPath();
         for (let x = -10; x <= w + 10; x += 3) {
