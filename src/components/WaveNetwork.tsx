@@ -126,8 +126,8 @@ const WaveNetwork = () => {
           const screenDist = Math.sqrt(screenDx * screenDx + screenDy * screenDy);
 
           // Depth-based properties
-          const depthFade = Math.min(1, scale * 1.8);
-          const baseSize = Math.max(0.5, 2.5 * scale);
+          const depthFade = Math.min(1, scale * 2.5);
+          const baseSize = Math.max(0.8, 3.5 * scale);
 
           // Focal glow boost
           const focalRadius = 250;
