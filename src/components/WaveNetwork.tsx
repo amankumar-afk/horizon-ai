@@ -71,7 +71,7 @@ const WaveNetwork = () => {
         }
 
         const waveDist = Math.abs(baseY - mouse.y);
-        const glow = waveDist < mouseRadius ? (1 - waveDist / mouseRadius) * 0.2 : 0;
+        const glow = waveDist < mouseRadius ? (1 - waveDist / mouseRadius) * 0.35 : 0;
 
         const r = 210 - edgeDist * 30;
         const g = 48 + (1 - edgeDist) * 40;
