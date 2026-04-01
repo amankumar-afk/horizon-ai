@@ -113,7 +113,7 @@ const WaveNetwork = () => {
         }
 
         const waveDist = Math.abs(baseX - mouse.x);
-        const glow = waveDist < mouseRadius ? (1 - waveDist / mouseRadius) * 0.1 : 0;
+        const glow = waveDist < mouseRadius ? (1 - waveDist / mouseRadius) * 0.2 : 0;
 
         ctx.strokeStyle = `rgba(210, 60, 60, ${lineAlpha + glow})`;
         ctx.lineWidth = lineWidth + glow * 1;
