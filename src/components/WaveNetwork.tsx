@@ -159,11 +159,11 @@ const WaveNetwork = () => {
 
         const colDist = Math.abs(baseX - smooth.x);
         const glow = colDist < mouseRadius
-          ? (1 - colDist / mouseRadius) * 0.15
+          ? (1 - colDist / mouseRadius) * 0.3
           : 0;
 
         ctx.strokeStyle = `rgba(200, 50, 50, ${baseAlpha + glow})`;
-        ctx.lineWidth = 0.4 + glow * 0.8;
+        ctx.lineWidth = 0.6 + glow * 1.5;
         ctx.stroke();
       }
 
