@@ -45,9 +45,9 @@ const WaveNetwork = () => {
       mouseRef.current = { x: -9999, y: -9999 };
     };
 
-    const gridSpacing = 20;
-    const cols = 140;
-    const rows = 120;
+    const gridSpacing = 18;
+    const cols = 160;
+    const rows = 150;
 
     const animate = () => {
       const w = window.innerWidth;
@@ -70,9 +70,9 @@ const WaveNetwork = () => {
       const focalY = smooth.y > 0 ? smooth.y : h / 2;
 
       // 3D perspective parameters
-      const vanishY = h * 0.35;
-      const eyeHeight = 150;
-      const perspectiveStrength = 220;
+      const vanishY = h * 0.1;
+      const eyeHeight = 120;
+      const perspectiveStrength = 180;
 
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
@@ -125,21 +125,21 @@ const WaveNetwork = () => {
           const screenDist = Math.sqrt(screenDx * screenDx + screenDy * screenDy);
 
           // Depth-based properties
-          const depthFade = Math.min(1, scale * 3);
-          const baseSize = Math.max(1, 4.5 * scale);
+          const depthFade = Math.min(1, scale * 3.5);
+          const baseSize = Math.max(0.6, 2 * scale);
 
-          // Bottom-edge boost: dots near bottom of screen get bolder
-          const bottomProximity = Math.max(0, (screenY - h * 0.5) / (h * 0.5));
-          const bottomBoost = bottomProximity * bottomProximity;
+          // Bottom-edge boost
+          const bottomProximity = Math.max(0, (screenY - h * 0.3) / (h * 0.7));
+          const bottomBoost = bottomProximity;
 
           // Focal glow boost
-          const focalRadius = 280;
+          const focalRadius = 250;
           const focalBoost = screenDist < focalRadius
             ? (1 - screenDist / focalRadius)
             : 0;
 
-          const dotSize = baseSize * (1 + bottomBoost * 0.8) + focalBoost * 4 * scale;
-          const dotAlpha = depthFade * (0.2 + bottomBoost * 0.35 + focalBoost * 0.5);
+          const dotSize = baseSize * (1 + bottomBoost * 0.5) + focalBoost * 2 * scale;
+          const dotAlpha = depthFade * (0.25 + bottomBoost * 0.45 + focalBoost * 0.4);
 
           // Color: red core, softer rose at distance
           const r = 200 + focalBoost * 30;
