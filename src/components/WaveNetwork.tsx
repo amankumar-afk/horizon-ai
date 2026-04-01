@@ -68,7 +68,7 @@ const WaveNetwork = () => {
       }
 
       // 3D projection — terrain anchored to bottom edge, expanding upward
-      const horizonY = h * 0.15;
+      const horizonY = h * 0.75;
       const focalLen = 250;
       const cameraHeight = 80;
 
