@@ -70,35 +70,31 @@ const WaveNetwork = () => {
       const focalY = smooth.y > 0 ? smooth.y : h / 2;
 
       // 3D perspective parameters
-      const vanishY = h * 0.1;
+      // Perspective: vanish point at bottom, field expands upward
+      const vanishY = h * 0.95;
       const eyeHeight = 120;
       const perspectiveStrength = 180;
 
       for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
-          // Grid position in world space (centered)
           const worldX = (col - cols / 2) * gridSpacing;
           const worldZ = row * gridSpacing + 20;
 
-          // Wave displacement in Y (height)
           const distFromFocalWorld = Math.sqrt(
-            (worldX - (focalX - w / 2)) ** 2 + (worldZ - (focalY - vanishY + 200)) ** 2
+            (worldX - (focalX - w / 2)) ** 2 + (worldZ - (vanishY - focalY + 200)) ** 2
           );
 
-          // Concentric waves from focal point
           let waveY = Math.sin(distFromFocalWorld * 0.04 - t * 2) * 15 *
             Math.max(0, 1 - distFromFocalWorld / 800);
 
-          // Ambient flowing wave
           waveY += Math.sin(worldX * 0.02 + t * 0.5) * 4;
           waveY += Math.sin(worldZ * 0.015 + t * 0.3) * 3;
 
-          // Click ripples
           for (const ripple of ripplesRef.current) {
             const age = t - ripple.birth;
             const rippleDist = Math.sqrt(
               (worldX - (ripple.x - w / 2)) ** 2 +
-              (worldZ - (ripple.y - vanishY + 200)) ** 2
+              (worldZ - (vanishY - ripple.y + 200)) ** 2
             );
             const waveRadius = age * 150;
             const ringDist = Math.abs(rippleDist - waveRadius);
@@ -110,11 +106,11 @@ const WaveNetwork = () => {
             }
           }
 
-          // Project 3D → 2D with perspective
+          // Project 3D → 2D: flip vertically so field grows upward from bottom
           const worldYPos = -waveY;
           const scale = perspectiveStrength / (worldZ + perspectiveStrength);
           const screenX = w / 2 + worldX * scale;
-          const screenY = vanishY + (worldYPos + eyeHeight) * scale;
+          const screenY = vanishY - (worldYPos + eyeHeight) * scale;
 
           // Skip if off screen
           if (screenX < -20 || screenX > w + 20 || screenY < -20 || screenY > h + 20) continue;
@@ -128,8 +124,8 @@ const WaveNetwork = () => {
           const depthFade = Math.min(1, scale * 3.5);
           const baseSize = Math.max(0.6, 2 * scale);
 
-          // Bottom-edge boost
-          const bottomProximity = Math.max(0, (screenY - h * 0.3) / (h * 0.7));
+          // Bottom-edge boost: dots near bottom are closer/bolder
+          const bottomProximity = Math.max(0, screenY - h * 0.4) / (h * 0.6);
           const bottomBoost = bottomProximity;
 
           // Focal glow boost
