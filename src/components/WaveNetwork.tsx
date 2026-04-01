@@ -141,7 +141,7 @@ const WaveNetwork = () => {
       for (let col = -1; col <= cols; col++) {
         const baseX = col * spacing;
         const edgeDist = Math.abs((baseX / w) - 0.5) * 2;
-        const baseAlpha = 0.06 + edgeDist * 0.08;
+        const baseAlpha = 0.12 + edgeDist * 0.15;
 
         ctx.beginPath();
         let started = false;
