@@ -59,16 +59,15 @@ const ParticleNetwork = () => {
           const maxDist = Math.sqrt(cx * cx + cy * cy);
           const centerFactor = distToCenter / maxDist;
           
-          // Skip some nodes near center to keep it airy
-          if (centerFactor < 0.25 && Math.random() > 0.3) continue;
-          if (centerFactor < 0.4 && Math.random() > 0.6) continue;
+          // Skip fewer nodes near center
+          if (centerFactor < 0.2 && Math.random() > 0.5) continue;
 
           nodes.push({
             x: jx, y: jy,
             originX: jx, originY: jy,
             vx: 0, vy: 0,
-            radius: 1.2 + Math.random() * 1.3,
-            opacity: 0.08 + centerFactor * 0.35,
+            radius: 1.8 + Math.random() * 1.8,
+            opacity: 0.2 + centerFactor * 0.45,
             pulsePhase: Math.random() * Math.PI * 2,
             pulseSpeed: 0.3 + Math.random() * 0.5,
           });
