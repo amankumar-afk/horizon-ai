@@ -18,22 +18,29 @@ const LoginCard = () => {
     setTimeout(() => setRipple(null), 600);
   };
 
-  return (
-    <div className="relative animate-fade-in-up">
-      {/* Card border trace animation */}
-      <div className="absolute -inset-[1px] rounded-2xl overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 rounded-2xl border-trace-animation" />
-      </div>
+  const inputClass = (field: string) =>
+    `w-full px-4 py-3 rounded-lg bg-background border text-sm transition-all duration-200 ease-out outline-none font-[400] ${
+      focusedField === field
+        ? "border-primary shadow-[0_0_0_3px_rgba(210,48,48,0.08)]"
+        : "border-border hover:border-muted-foreground/40"
+    }`;
 
-      <div className="relative bg-card/80 backdrop-blur-xl rounded-2xl p-10 md:p-12 shadow-card border border-border/50 w-full max-w-md">
-        <h2 className="text-2xl font-bold text-foreground mb-2">
+  return (
+    <div className="animate-fade-in-up">
+      <div
+        className="relative bg-card rounded-2xl p-10 md:p-12 w-full max-w-[420px]"
+        style={{
+          boxShadow: "0 4px 60px -15px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.03), 0 0 40px -10px rgba(210,48,48,0.06)",
+        }}
+      >
+        <h2 className="text-[22px] font-bold text-foreground mb-1.5 leading-tight">
           Login with your Rista account
         </h2>
-        <p className="text-muted-foreground text-sm mb-8">
+        <p className="text-muted-foreground text-sm mb-8 font-[400]">
           Enter your details below to login to your account
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="block text-sm font-semibold text-foreground mb-2">
               Account Number
@@ -46,11 +53,7 @@ const LoginCard = () => {
               onChange={(e) => setAccountNumber(e.target.value)}
               onFocus={() => setFocusedField("account")}
               onBlur={() => setFocusedField(null)}
-              className={`w-full px-4 py-3 rounded-lg bg-background border text-foreground placeholder:text-muted-foreground text-sm transition-all duration-300 outline-none ${
-                focusedField === "account"
-                  ? "border-primary shadow-[0_0_0_3px_rgba(210,48,48,0.1)]"
-                  : "border-border hover:border-muted-foreground/40"
-              }`}
+              className={inputClass("account")}
             />
           </div>
 
@@ -65,11 +68,7 @@ const LoginCard = () => {
               onChange={(e) => setUserId(e.target.value)}
               onFocus={() => setFocusedField("user")}
               onBlur={() => setFocusedField(null)}
-              className={`w-full px-4 py-3 rounded-lg bg-background border text-foreground placeholder:text-muted-foreground text-sm transition-all duration-300 outline-none ${
-                focusedField === "user"
-                  ? "border-primary shadow-[0_0_0_3px_rgba(210,48,48,0.1)]"
-                  : "border-border hover:border-muted-foreground/40"
-              }`}
+              className={inputClass("user")}
             />
           </div>
 
@@ -85,11 +84,7 @@ const LoginCard = () => {
               onChange={(e) => setPin(e.target.value)}
               onFocus={() => setFocusedField("pin")}
               onBlur={() => setFocusedField(null)}
-              className={`w-full px-4 py-3 rounded-lg bg-background border text-foreground placeholder:text-muted-foreground text-sm transition-all duration-300 outline-none ${
-                focusedField === "pin"
-                  ? "border-primary shadow-[0_0_0_3px_rgba(210,48,48,0.1)]"
-                  : "border-border hover:border-muted-foreground/40"
-              }`}
+              className={inputClass("pin")}
             />
           </div>
 
@@ -97,7 +92,7 @@ const LoginCard = () => {
             ref={buttonRef}
             type="submit"
             onClick={handleButtonClick}
-            className="relative w-full py-3.5 bg-primary text-primary-foreground font-semibold rounded-lg overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_8px_25px_-5px_rgba(210,48,48,0.4)] active:scale-[0.98]"
+            className="relative w-full py-3.5 bg-primary text-primary-foreground font-semibold rounded-lg overflow-hidden transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_8px_25px_-5px_rgba(210,48,48,0.4)] active:scale-[0.98]"
           >
             {ripple && (
               <span
@@ -114,7 +109,7 @@ const LoginCard = () => {
           </button>
         </form>
 
-        <p className="text-center text-xs text-muted-foreground mt-6">
+        <p className="text-center text-xs text-muted-foreground mt-6 font-[400]">
           By clicking continue, you agree to our{" "}
           <a href="#" className="text-primary hover:underline font-medium">
             Terms
