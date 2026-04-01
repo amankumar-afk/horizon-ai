@@ -41,15 +41,14 @@ const WaveNetwork = () => {
       const mouseRadius = 200;
 
       // === LAYER 1: Flowing topology lines (like contour/heatmap lines) ===
-      const topoCount = 22;
+      const topoCount = 45;
       for (let i = 0; i < topoCount; i++) {
         const baseY = (i / (topoCount - 1)) * h;
         const normalizedI = i / (topoCount - 1);
         
-        // Create organic clustering — denser at edges, breathing room in center
-        const edgeDist = Math.abs(normalizedI - 0.5) * 2; // 0 at center, 1 at edges
-        const lineAlpha = 0.03 + edgeDist * 0.12;
-        const lineWidth = 0.4 + edgeDist * 0.8;
+        const edgeDist = Math.abs(normalizedI - 0.5) * 2;
+        const lineAlpha = 0.04 + edgeDist * 0.14;
+        const lineWidth = 0.5 + edgeDist * 1.0;
 
         // Unique wave signature per line
         const freq1 = 0.004 + Math.sin(i * 0.7) * 0.002;
