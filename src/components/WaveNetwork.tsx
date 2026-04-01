@@ -90,8 +90,8 @@ const WaveNetwork = () => {
       for (let i = 0; i < vCount; i++) {
         const baseX = i * vSpacing;
         const edgeDist = Math.abs(i / (vCount - 1) - 0.5) * 2;
-        const lineAlpha = 0.02 + edgeDist * 0.05;
-        const lineWidth = 0.3 + edgeDist * 0.4;
+        const lineAlpha = 0.06 + edgeDist * 0.12;
+        const lineWidth = 0.5 + edgeDist * 0.7;
 
         ctx.beginPath();
         for (let y = -10; y <= h + 10; y += 4) {
