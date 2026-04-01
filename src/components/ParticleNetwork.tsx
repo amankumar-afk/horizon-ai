@@ -1,177 +1,205 @@
 import { useEffect, useRef } from "react";
 
-interface Particle {
+interface Node {
   x: number;
   y: number;
+  originX: number;
+  originY: number;
   vx: number;
   vy: number;
   radius: number;
   opacity: number;
-  baseX: number;
-  baseY: number;
+  pulsePhase: number;
+  pulseSpeed: number;
 }
 
 const ParticleNetwork = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mouseRef = useRef({ x: -1000, y: -1000 });
-  const particlesRef = useRef<Particle[]>([]);
+  const mouseRef = useRef({ x: -9999, y: -9999 });
+  const nodesRef = useRef<Node[]>([]);
   const animRef = useRef<number>(0);
-  const pulseRef = useRef<{ x: number; y: number; radius: number; opacity: number }[]>([]);
   const timeRef = useRef(0);
+  const fadeInRef = useRef(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d")!;
+    let dpr = window.devicePixelRatio || 1;
 
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      initParticles();
+      dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      canvas.style.width = window.innerWidth + "px";
+      canvas.style.height = window.innerHeight + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      initNodes();
     };
 
-    const initParticles = () => {
-      const count = Math.floor((canvas.width * canvas.height) / 6000);
-      const particles: Particle[] = [];
+    const initNodes = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const spacing = 70;
+      const cols = Math.ceil(w / spacing) + 2;
+      const rows = Math.ceil(h / spacing) + 2;
+      const nodes: Node[] = [];
 
-      for (let i = 0; i < count; i++) {
-        // Bias particles toward corners/edges
-        let x: number, y: number;
-        const zone = Math.random();
-        if (zone < 0.35) {
-          // top-left corner
-          x = Math.random() * canvas.width * 0.4;
-          y = Math.random() * canvas.height * 0.4;
-        } else if (zone < 0.7) {
-          // bottom-right corner
-          x = canvas.width * 0.6 + Math.random() * canvas.width * 0.4;
-          y = canvas.height * 0.6 + Math.random() * canvas.height * 0.4;
-        } else if (zone < 0.8) {
-          // top-right
-          x = canvas.width * 0.7 + Math.random() * canvas.width * 0.3;
-          y = Math.random() * canvas.height * 0.3;
-        } else if (zone < 0.9) {
-          // bottom-left
-          x = Math.random() * canvas.width * 0.3;
-          y = canvas.height * 0.7 + Math.random() * canvas.height * 0.3;
-        } else {
-          // scattered elsewhere (sparse)
-          x = Math.random() * canvas.width;
-          y = Math.random() * canvas.height;
+      for (let row = -1; row < rows; row++) {
+        for (let col = -1; col < cols; col++) {
+          const x = col * spacing + (row % 2 === 0 ? 0 : spacing * 0.5);
+          const y = row * spacing * 0.866;
+          // Add organic jitter
+          const jx = x + (Math.random() - 0.5) * spacing * 0.4;
+          const jy = y + (Math.random() - 0.5) * spacing * 0.4;
+
+          // Density falloff toward center for breathing room
+          const cx = w * 0.5, cy = h * 0.5;
+          const distToCenter = Math.sqrt((jx - cx) ** 2 + (jy - cy) ** 2);
+          const maxDist = Math.sqrt(cx * cx + cy * cy);
+          const centerFactor = distToCenter / maxDist;
+          
+          // Skip some nodes near center to keep it airy
+          if (centerFactor < 0.25 && Math.random() > 0.3) continue;
+          if (centerFactor < 0.4 && Math.random() > 0.6) continue;
+
+          nodes.push({
+            x: jx, y: jy,
+            originX: jx, originY: jy,
+            vx: 0, vy: 0,
+            radius: 1.2 + Math.random() * 1.3,
+            opacity: 0.08 + centerFactor * 0.35,
+            pulsePhase: Math.random() * Math.PI * 2,
+            pulseSpeed: 0.3 + Math.random() * 0.5,
+          });
         }
-
-        particles.push({
-          x,
-          y,
-          baseX: x,
-          baseY: y,
-          vx: (Math.random() - 0.5) * 0.5,
-          vy: (Math.random() - 0.5) * 0.5,
-          radius: Math.random() * 2.5 + 1.2,
-          opacity: Math.random() * 0.6 + 0.15,
-        });
       }
-      particlesRef.current = particles;
+      nodesRef.current = nodes;
     };
 
     const handleMouseMove = (e: MouseEvent) => {
       mouseRef.current = { x: e.clientX, y: e.clientY };
     };
-
     const handleMouseLeave = () => {
-      mouseRef.current = { x: -1000, y: -1000 };
+      mouseRef.current = { x: -9999, y: -9999 };
     };
 
     const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const particles = particlesRef.current;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      ctx.clearRect(0, 0, w, h);
+
+      const nodes = nodesRef.current;
       const mouse = mouseRef.current;
-      timeRef.current += 0.005;
+      timeRef.current += 0.008;
+      fadeInRef.current = Math.min(fadeInRef.current + 0.015, 1);
+      const t = timeRef.current;
+      const globalAlpha = fadeInRef.current;
 
-      // Update & draw particles
-      for (const p of particles) {
-        // Gentle drift
-        p.x += p.vx;
-        p.y += p.vy;
+      const mouseRadius = 180;
 
-        // Soft boundary bounce
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+      // Update nodes
+      for (const n of nodes) {
+        // Gentle organic breathing motion
+        const breathX = Math.sin(t * n.pulseSpeed + n.pulsePhase) * 3;
+        const breathY = Math.cos(t * n.pulseSpeed * 0.7 + n.pulsePhase + 1) * 3;
 
-        // Gentle return to base area
-        p.vx += (p.baseX - p.x) * 0.0001;
-        p.vy += (p.baseY - p.y) * 0.0001;
+        let targetX = n.originX + breathX;
+        let targetY = n.originY + breathY;
 
-        // Mouse attraction
-        const dx = mouse.x - p.x;
-        const dy = mouse.y - p.y;
+        // Mouse repulsion + attraction ring
+        const dx = mouse.x - n.x;
+        const dy = mouse.y - n.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        let drawOpacity = p.opacity;
 
-        if (dist < 200) {
-          const force = (200 - dist) / 200;
-          p.vx += dx * force * 0.0008;
-          p.vy += dy * force * 0.0008;
-          drawOpacity = Math.min(p.opacity + force * 0.4, 0.8);
+        let mouseInfluence = 0;
+        if (dist < mouseRadius) {
+          const force = (mouseRadius - dist) / mouseRadius;
+          mouseInfluence = force;
+          // Inner zone: attract; outer zone: gentle push
+          if (dist < mouseRadius * 0.4) {
+            targetX += dx * force * 0.15;
+            targetY += dy * force * 0.15;
+          } else {
+            targetX -= dx * force * 0.06;
+            targetY -= dy * force * 0.06;
+          }
         }
 
-        // Damping
-        p.vx *= 0.99;
-        p.vy *= 0.99;
+        // Spring physics to target
+        n.vx += (targetX - n.x) * 0.04;
+        n.vy += (targetY - n.y) * 0.04;
+        n.vx *= 0.88;
+        n.vy *= 0.88;
+        n.x += n.vx;
+        n.y += n.vy;
+
+        // Pulsing glow near mouse
+        const pulse = Math.sin(t * 3 + n.pulsePhase) * 0.5 + 0.5;
+        const drawOpacity = (n.opacity + mouseInfluence * 0.5 + pulse * mouseInfluence * 0.2) * globalAlpha;
+        const drawRadius = n.radius + mouseInfluence * 2;
+
+        // Draw node with glow
+        if (mouseInfluence > 0.3) {
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, drawRadius * 3, 0, Math.PI * 2);
+          const glow = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, drawRadius * 3);
+          glow.addColorStop(0, `rgba(210, 48, 48, ${drawOpacity * 0.15})`);
+          glow.addColorStop(1, `rgba(210, 48, 48, 0)`);
+          ctx.fillStyle = glow;
+          ctx.fill();
+        }
 
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.arc(n.x, n.y, drawRadius, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(210, 48, 48, ${drawOpacity})`;
         ctx.fill();
       }
 
-      // Draw connections
-      const maxDist = 160;
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
+      // Draw connections — triangulated mesh look
+      const maxConn = 130;
+      for (let i = 0; i < nodes.length; i++) {
+        const a = nodes[i];
+        for (let j = i + 1; j < nodes.length; j++) {
+          const b = nodes[j];
+          const dx = a.x - b.x;
+          const dy = a.y - b.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < maxDist) {
-            const opacity = (1 - dist / maxDist) * 0.18;
+          if (dist > maxConn) continue;
 
-            // Occasional pulse along connection
-            const pulsePhase = Math.sin(timeRef.current * 2 + i * 0.1 + j * 0.05);
-            const pulseBoost = pulsePhase > 0.95 ? 0.15 : 0;
+          const falloff = 1 - dist / maxConn;
 
+          // Boost near mouse
+          const midX = (a.x + b.x) / 2;
+          const midY = (a.y + b.y) / 2;
+          const mdx = mouse.x - midX;
+          const mdy = mouse.y - midY;
+          const mDist = Math.sqrt(mdx * mdx + mdy * mdy);
+          const mouseBoost = mDist < mouseRadius ? (mouseRadius - mDist) / mouseRadius * 0.25 : 0;
+
+          // Traveling pulse along line
+          const pulseT = (Math.sin(t * 1.5 + i * 0.03 + j * 0.02) + 1) * 0.5;
+          const hasPulse = pulseT > 0.92;
+
+          const lineOpacity = (falloff * 0.1 + mouseBoost + (hasPulse ? 0.12 : 0)) * globalAlpha;
+
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.strokeStyle = `rgba(210, 48, 48, ${lineOpacity})`;
+          ctx.lineWidth = hasPulse ? 1.2 : 0.5;
+          ctx.stroke();
+
+          // Draw traveling pulse dot
+          if (hasPulse && mouseBoost > 0) {
+            const px = a.x + (b.x - a.x) * pulseT;
+            const py = a.y + (b.y - a.y) * pulseT;
             ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(210, 48, 48, ${opacity + pulseBoost})`;
-            ctx.lineWidth = 0.6;
-            ctx.stroke();
+            ctx.arc(px, py, 1.5, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(210, 48, 48, ${0.6 * globalAlpha})`;
+            ctx.fill();
           }
         }
-      }
-
-      // Draw pulse waves from logo area
-      if (Math.random() < 0.003) {
-        pulseRef.current.push({
-          x: canvas.width * 0.25,
-          y: canvas.height * 0.4,
-          radius: 0,
-          opacity: 0.08,
-        });
-      }
-
-      for (let i = pulseRef.current.length - 1; i >= 0; i--) {
-        const pulse = pulseRef.current[i];
-        pulse.radius += 0.8;
-        pulse.opacity -= 0.0003;
-        if (pulse.opacity <= 0) {
-          pulseRef.current.splice(i, 1);
-          continue;
-        }
-        ctx.beginPath();
-        ctx.arc(pulse.x, pulse.y, pulse.radius, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(210, 48, 48, ${pulse.opacity})`;
-        ctx.lineWidth = 1;
-        ctx.stroke();
       }
 
       animRef.current = requestAnimationFrame(animate);
@@ -194,8 +222,8 @@ const ParticleNetwork = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none"
-      style={{ zIndex: 0 }}
+      className="fixed inset-0"
+      style={{ zIndex: 0, pointerEvents: "none" }}
     />
   );
 };
