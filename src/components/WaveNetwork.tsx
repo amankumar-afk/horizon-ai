@@ -28,17 +28,7 @@ const WaveNetwork = () => {
       mouseRef.current = { x: -9999, y: -9999 };
     };
 
-    // Data-inspired "pulse" nodes — like data points on a chart
-    const dataNodes: { x: number; y: number; phase: number; size: number; pulseSpeed: number }[] = [];
-    for (let i = 0; i < 40; i++) {
-      dataNodes.push({
-        x: Math.random() * window.innerWidth,
-        y: Math.random() * window.innerHeight,
-        phase: Math.random() * Math.PI * 2,
-        size: 1.5 + Math.random() * 2.5,
-        pulseSpeed: 0.5 + Math.random() * 1.5,
-      });
-    }
+
 
     const animate = () => {
       const w = window.innerWidth;
@@ -51,15 +41,14 @@ const WaveNetwork = () => {
       const mouseRadius = 200;
 
       // === LAYER 1: Flowing topology lines (like contour/heatmap lines) ===
-      const topoCount = 22;
+      const topoCount = 45;
       for (let i = 0; i < topoCount; i++) {
         const baseY = (i / (topoCount - 1)) * h;
         const normalizedI = i / (topoCount - 1);
         
-        // Create organic clustering — denser at edges, breathing room in center
-        const edgeDist = Math.abs(normalizedI - 0.5) * 2; // 0 at center, 1 at edges
-        const lineAlpha = 0.03 + edgeDist * 0.12;
-        const lineWidth = 0.4 + edgeDist * 0.8;
+        const edgeDist = Math.abs(normalizedI - 0.5) * 2;
+        const lineAlpha = 0.04 + edgeDist * 0.14;
+        const lineWidth = 0.5 + edgeDist * 1.0;
 
         // Unique wave signature per line
         const freq1 = 0.004 + Math.sin(i * 0.7) * 0.002;
@@ -106,14 +95,14 @@ const WaveNetwork = () => {
         ctx.stroke();
       }
 
-      // === LAYER 2: Meridian lines (vertical, like grid references) ===
-      const meridianCount = 8;
+      // === LAYER 2: Meridian lines (vertical, denser) ===
+      const meridianCount = 16;
       for (let i = 0; i < meridianCount; i++) {
         const baseX = ((i + 0.5) / meridianCount) * w;
         const edgeDist = Math.abs((i + 0.5) / meridianCount - 0.5) * 2;
-        const alpha = 0.015 + edgeDist * 0.04;
+        const alpha = 0.02 + edgeDist * 0.06;
         const freq = 0.006 + Math.cos(i * 1.1) * 0.002;
-        const amp = 6 + edgeDist * 12;
+        const amp = 8 + edgeDist * 14;
         const phase = i * 1.2 + t * 0.4;
 
         ctx.beginPath();
@@ -138,60 +127,6 @@ const WaveNetwork = () => {
         ctx.stroke();
       }
 
-      // === LAYER 3: Data pulse nodes — floating analytics dots ===
-      for (const node of dataNodes) {
-        const pulse = Math.sin(t * node.pulseSpeed + node.phase);
-        const size = node.size + pulse * 0.8;
-        const alpha = 0.06 + pulse * 0.04;
-
-        // Gentle float
-        const fx = node.x + Math.sin(t * 0.3 + node.phase) * 15;
-        const fy = node.y + Math.cos(t * 0.2 + node.phase * 1.3) * 10;
-
-        // Mouse proximity boost
-        const dx = fx - mouse.x;
-        const dy = fy - mouse.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const mouseBoost = dist < mouseRadius ? (1 - dist / mouseRadius) : 0;
-
-        const finalAlpha = Math.min(alpha + mouseBoost * 0.3, 0.5);
-        const finalSize = size + mouseBoost * 3;
-
-        // Outer glow
-        if (mouseBoost > 0.1) {
-          const gradient = ctx.createRadialGradient(fx, fy, 0, fx, fy, finalSize * 4);
-          gradient.addColorStop(0, `rgba(210, 48, 48, ${mouseBoost * 0.15})`);
-          gradient.addColorStop(1, `rgba(210, 48, 48, 0)`);
-          ctx.beginPath();
-          ctx.arc(fx, fy, finalSize * 4, 0, Math.PI * 2);
-          ctx.fillStyle = gradient;
-          ctx.fill();
-        }
-
-        // Core dot
-        ctx.beginPath();
-        ctx.arc(fx, fy, finalSize, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(210, 48, 48, ${finalAlpha})`;
-        ctx.fill();
-
-        // Connect nearby nodes near mouse
-        if (mouseBoost > 0.2) {
-          for (const other of dataNodes) {
-            if (other === node) continue;
-            const ox = other.x + Math.sin(t * 0.3 + other.phase) * 15;
-            const oy = other.y + Math.cos(t * 0.2 + other.phase * 1.3) * 10;
-            const nd = Math.sqrt((fx - ox) ** 2 + (fy - oy) ** 2);
-            if (nd < 150) {
-              ctx.beginPath();
-              ctx.moveTo(fx, fy);
-              ctx.lineTo(ox, oy);
-              ctx.strokeStyle = `rgba(210, 48, 48, ${mouseBoost * 0.08 * (1 - nd / 150)})`;
-              ctx.lineWidth = 0.5;
-              ctx.stroke();
-            }
-          }
-        }
-      }
 
       // === LAYER 4: Mouse focus ring — "analytical lens" ===
       if (mouse.x > 0 && mouse.y > 0) {
