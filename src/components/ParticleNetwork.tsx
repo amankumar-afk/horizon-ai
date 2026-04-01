@@ -133,7 +133,7 @@ const ParticleNetwork = () => {
           const dy = particles[i].y - particles[j].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < maxDist) {
-            const opacity = (1 - dist / maxDist) * 0.12;
+            const opacity = (1 - dist / maxDist) * 0.18;
 
             // Occasional pulse along connection
             const pulsePhase = Math.sin(timeRef.current * 2 + i * 0.1 + j * 0.05);
