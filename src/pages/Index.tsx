@@ -6,8 +6,8 @@ import logo from "@/assets/dotpe-horizon-logo.svg";
 const Index = () => {
   return (
     <div className="relative min-h-screen bg-background overflow-hidden" style={{ pointerEvents: "auto" }}>
-      {/* Particle Network Background */}
-      <ParticleNetwork />
+      {/* Wave Network Background */}
+      <WaveNetwork />
 
       {/* Subtle gradient overlay for depth */}
       <div
