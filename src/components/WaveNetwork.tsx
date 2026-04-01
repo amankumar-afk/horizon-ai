@@ -62,9 +62,9 @@ const WaveNetwork = () => {
       }
 
       // Camera: low angle looking across the terrain
-      const horizonY = h * 0.55; // horizon at ~55% from top
-      const focalLen = 300;
-      const cameraHeight = 80;
+      const horizonY = h * 0.25;
+      const focalLen = 250;
+      const cameraHeight = 90;
 
       for (let row = 0; row < ROWS; row++) {
         for (let col = 0; col < COLS; col++) {
