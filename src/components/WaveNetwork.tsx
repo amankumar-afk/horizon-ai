@@ -85,19 +85,19 @@ const WaveNetwork = () => {
 
         // Click ripples
         for (const ripple of ripplesRef.current) {
-          const age = (t - ripple.birth) * 300;
+          const age = (t - ripple.birth) * 200;
           const rx = gx - ripple.x;
           const ry = gy - ripple.y;
           const rDist = Math.sqrt(rx * rx + ry * ry);
-          const waveRadius = age * 1.8;
+          const waveRadius = age * 2.5;
           const ringDist = Math.abs(rDist - waveRadius);
-          const ringWidth = 80;
+          const ringWidth = 120;
 
           if (ringDist < ringWidth) {
-            const fade = Math.max(0, 1 - age / 400); // die after ~400
+            const fade = Math.max(0, 1 - age / 600);
             const ringForce = (1 - ringDist / ringWidth) * fade * ripple.strength;
             const angle = Math.atan2(ry, rx);
-            const displacement = Math.sin(ringDist * 0.08) * ringForce * 12;
+            const displacement = Math.sin(ringDist * 0.06) * ringForce * 30;
             dx += Math.cos(angle) * displacement;
             dy += Math.sin(angle) * displacement;
           }
