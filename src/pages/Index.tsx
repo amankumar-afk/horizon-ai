@@ -2,34 +2,6 @@ import ParticleNetwork from "@/components/ParticleNetwork";
 import LoginCard from "@/components/LoginCard";
 import logo from "@/assets/dotpe-horizon-logo.svg";
 
-const GhostChart = ({ delay, className }: { delay: string; className: string }) => (
-  <svg
-    className={`absolute opacity-0 ${className}`}
-    style={{ animation: `ghostFade 6s ease-in-out ${delay} infinite` }}
-    width="120"
-    height="50"
-    viewBox="0 0 120 50"
-  >
-    <polyline
-      fill="none"
-      stroke="rgba(210,48,48,0.1)"
-      strokeWidth="1.5"
-      points="0,40 20,35 40,25 60,30 80,15 100,20 120,10"
-    />
-  </svg>
-);
-
-const GhostPercentage = ({ value, delay, className }: { value: string; delay: string; className: string }) => (
-  <span
-    className={`absolute text-2xl font-bold ${className}`}
-    style={{
-      color: "rgba(210,48,48,0.08)",
-      animation: `ghostFade 8s ease-in-out ${delay} infinite`,
-    }}
-  >
-    {value}
-  </span>
-);
 
 const Index = () => {
   return (
@@ -50,11 +22,6 @@ const Index = () => {
       <div className="relative z-10 min-h-screen flex flex-col lg:flex-row items-center justify-center px-6 md:px-12 lg:px-20 gap-12 lg:gap-20">
         {/* Left: Branding */}
         <div className="flex-1 max-w-xl animate-slide-in-left relative">
-          {/* Ghost data visualizations */}
-          <GhostChart delay="0s" className="top-10 right-0" />
-          <GhostChart delay="3s" className="bottom-20 left-10" />
-          <GhostPercentage value="+24%" delay="1s" className="top-0 right-20" />
-          <GhostPercentage value="↑ 18%" delay="4s" className="bottom-10 right-5" />
 
           <img
             src={logo}
