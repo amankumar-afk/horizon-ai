@@ -135,8 +135,8 @@ const ParticleNetwork = () => {
 
         // Pulsing glow near mouse
         const pulse = Math.sin(t * 3 + n.pulsePhase) * 0.5 + 0.5;
-        const drawOpacity = (n.opacity + mouseInfluence * 0.5 + pulse * mouseInfluence * 0.2) * globalAlpha;
-        const drawRadius = n.radius + mouseInfluence * 2;
+        const drawOpacity = (n.opacity + mouseInfluence * 0.6 + pulse * mouseInfluence * 0.3) * globalAlpha;
+        const drawRadius = n.radius + mouseInfluence * 3;
 
         // Draw node with glow
         if (mouseInfluence > 0.3) {
