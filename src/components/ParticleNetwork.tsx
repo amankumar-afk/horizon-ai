@@ -31,7 +31,7 @@ const ParticleNetwork = () => {
     };
 
     const initParticles = () => {
-      const count = Math.floor((canvas.width * canvas.height) / 12000);
+      const count = Math.floor((canvas.width * canvas.height) / 6000);
       const particles: Particle[] = [];
 
       for (let i = 0; i < count; i++) {
@@ -65,10 +65,10 @@ const ParticleNetwork = () => {
           y,
           baseX: x,
           baseY: y,
-          vx: (Math.random() - 0.5) * 0.3,
-          vy: (Math.random() - 0.5) * 0.3,
-          radius: Math.random() * 2 + 1,
-          opacity: Math.random() * 0.5 + 0.1,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          radius: Math.random() * 2.5 + 1.2,
+          opacity: Math.random() * 0.6 + 0.15,
         });
       }
       particlesRef.current = particles;
@@ -126,14 +126,14 @@ const ParticleNetwork = () => {
       }
 
       // Draw connections
-      const maxDist = 120;
+      const maxDist = 160;
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < maxDist) {
-            const opacity = (1 - dist / maxDist) * 0.12;
+            const opacity = (1 - dist / maxDist) * 0.18;
 
             // Occasional pulse along connection
             const pulsePhase = Math.sin(timeRef.current * 2 + i * 0.1 + j * 0.05);
