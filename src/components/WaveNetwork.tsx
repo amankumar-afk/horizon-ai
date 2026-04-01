@@ -135,8 +135,8 @@ const WaveNetwork = () => {
             ? (1 - screenDist / focalRadius)
             : 0;
 
-          const dotSize = baseSize + focalBoost * 2.5 * scale;
-          const dotAlpha = depthFade * (0.12 + focalBoost * 0.55);
+          const dotSize = baseSize + focalBoost * 3.5 * scale;
+          const dotAlpha = depthFade * (0.2 + focalBoost * 0.6);
 
           // Color: red core, softer rose at distance
           const r = 200 + focalBoost * 30;
