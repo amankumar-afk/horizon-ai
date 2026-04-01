@@ -50,20 +50,22 @@ const WaveNetwork = () => {
 
         ctx.beginPath();
         for (let x = -10; x <= w + 10; x += 3) {
-          let y = baseY;
+          // Ambient flowing wave — always active
+          let y = baseY
+            + Math.sin(x * 0.008 + t * 1.2) * 8
+            + Math.sin(x * 0.02 + t * 0.8 + i * 0.1) * 4
+            + Math.cos(x * 0.005 + t * 0.5) * 3;
 
-          // Mouse hover → wavy distortion (same wave for all lines = stay parallel)
+          // Mouse hover → amplified parallel wave distortion
           const dx = x - mouse.x;
           const dy = baseY - mouse.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < mouseRadius) {
             const force = 1 - dist / mouseRadius;
             const smooth = force * force * (3 - 2 * force);
-            // Shared wave function — identical for every line → parallel displacement
-            y += Math.sin(x * 0.025 + t * 3) * smooth * 18;
-            y += Math.sin(x * 0.06 + t * 5) * smooth * 6;
-            // Push away from cursor vertically
-            y += (dy > 0 ? 1 : -1) * smooth * 12;
+            y += Math.sin(x * 0.025 + t * 3) * smooth * 22;
+            y += Math.sin(x * 0.06 + t * 5) * smooth * 8;
+            y += (dy > 0 ? 1 : -1) * smooth * 14;
           }
 
           if (x === -10) ctx.moveTo(x, y);
