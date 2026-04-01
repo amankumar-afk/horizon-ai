@@ -186,7 +186,7 @@ const ParticleNetwork = () => {
           ctx.moveTo(a.x, a.y);
           ctx.lineTo(b.x, b.y);
           ctx.strokeStyle = `rgba(210, 48, 48, ${lineOpacity})`;
-          ctx.lineWidth = hasPulse ? 1.2 : 0.5;
+          ctx.lineWidth = hasPulse ? 1.5 : 0.8;
           ctx.stroke();
 
           // Draw traveling pulse dot
