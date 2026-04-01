@@ -31,7 +31,7 @@ const ParticleNetwork = () => {
     };
 
     const initParticles = () => {
-      const count = Math.floor((canvas.width * canvas.height) / 12000);
+      const count = Math.floor((canvas.width * canvas.height) / 6000);
       const particles: Particle[] = [];
 
       for (let i = 0; i < count; i++) {
