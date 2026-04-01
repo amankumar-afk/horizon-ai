@@ -47,8 +47,8 @@ const WaveNetwork = () => {
 
     // Grid parameters
     const gridSpacing = 22;
-    const cols = 100;
-    const rows = 60;
+    const cols = 120;
+    const rows = 90;
 
     const animate = () => {
       const w = window.innerWidth;
