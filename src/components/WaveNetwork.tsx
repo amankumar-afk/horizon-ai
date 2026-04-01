@@ -78,26 +78,26 @@ const WaveNetwork = () => {
         const mDist = Math.sqrt(mx * mx + my * my);
         if (mDist < mouseRadius && mDist > 0) {
           const force = 1 - mDist / mouseRadius;
-          const smooth3 = force * force * force; // cubic ease — very gentle at edges
-          dx += (mx / mDist) * smooth3 * -18;
-          dy += (my / mDist) * smooth3 * -18;
+          const smooth3 = force * force * force;
+          dx += (mx / mDist) * smooth3 * -35;
+          dy += (my / mDist) * smooth3 * -35;
         }
 
         // Click ripples
         for (const ripple of ripplesRef.current) {
-          const age = (t - ripple.birth) * 300;
+          const age = (t - ripple.birth) * 200;
           const rx = gx - ripple.x;
           const ry = gy - ripple.y;
           const rDist = Math.sqrt(rx * rx + ry * ry);
-          const waveRadius = age * 1.8;
+          const waveRadius = age * 2.5;
           const ringDist = Math.abs(rDist - waveRadius);
-          const ringWidth = 80;
+          const ringWidth = 120;
 
           if (ringDist < ringWidth) {
-            const fade = Math.max(0, 1 - age / 400); // die after ~400
+            const fade = Math.max(0, 1 - age / 600);
             const ringForce = (1 - ringDist / ringWidth) * fade * ripple.strength;
             const angle = Math.atan2(ry, rx);
-            const displacement = Math.sin(ringDist * 0.08) * ringForce * 12;
+            const displacement = Math.sin(ringDist * 0.06) * ringForce * 30;
             dx += Math.cos(angle) * displacement;
             dy += Math.sin(angle) * displacement;
           }
@@ -110,7 +110,7 @@ const WaveNetwork = () => {
       for (let row = -1; row <= rows; row++) {
         const baseY = row * spacing;
         const edgeDist = Math.abs((baseY / h) - 0.5) * 2;
-        const baseAlpha = 0.06 + edgeDist * 0.08;
+        const baseAlpha = 0.12 + edgeDist * 0.15;
 
         ctx.beginPath();
         let started = false;
@@ -129,11 +129,11 @@ const WaveNetwork = () => {
         // Mouse proximity glow
         const rowDist = Math.abs(baseY - smooth.y);
         const glow = rowDist < mouseRadius
-          ? (1 - rowDist / mouseRadius) * 0.15
+          ? (1 - rowDist / mouseRadius) * 0.3
           : 0;
 
         ctx.strokeStyle = `rgba(200, 50, 50, ${baseAlpha + glow})`;
-        ctx.lineWidth = 0.4 + glow * 0.8;
+        ctx.lineWidth = 0.6 + glow * 1.5;
         ctx.stroke();
       }
 
@@ -141,7 +141,7 @@ const WaveNetwork = () => {
       for (let col = -1; col <= cols; col++) {
         const baseX = col * spacing;
         const edgeDist = Math.abs((baseX / w) - 0.5) * 2;
-        const baseAlpha = 0.06 + edgeDist * 0.08;
+        const baseAlpha = 0.12 + edgeDist * 0.15;
 
         ctx.beginPath();
         let started = false;
@@ -159,11 +159,11 @@ const WaveNetwork = () => {
 
         const colDist = Math.abs(baseX - smooth.x);
         const glow = colDist < mouseRadius
-          ? (1 - colDist / mouseRadius) * 0.15
+          ? (1 - colDist / mouseRadius) * 0.3
           : 0;
 
         ctx.strokeStyle = `rgba(200, 50, 50, ${baseAlpha + glow})`;
-        ctx.lineWidth = 0.4 + glow * 0.8;
+        ctx.lineWidth = 0.6 + glow * 1.5;
         ctx.stroke();
       }
 
@@ -176,11 +176,11 @@ const WaveNetwork = () => {
           const my = baseY - smooth.y;
           const mDist = Math.sqrt(mx * mx + my * my);
 
-          if (mDist < mouseRadius * 0.6) {
+          if (mDist < mouseRadius * 0.7) {
             const [dx, dy] = getDisplacement(baseX, baseY);
-            const force = 1 - mDist / (mouseRadius * 0.6);
-            const dotAlpha = force * force * 0.3;
-            const dotSize = 1 + force * 1.5;
+            const force = 1 - mDist / (mouseRadius * 0.7);
+            const dotAlpha = force * force * 0.5;
+            const dotSize = 1.5 + force * 2.5;
 
             ctx.beginPath();
             ctx.arc(baseX + dx, baseY + dy, dotSize, 0, Math.PI * 2);
@@ -192,7 +192,7 @@ const WaveNetwork = () => {
 
       // Clean up expired ripples
       ripplesRef.current = ripplesRef.current.filter(
-        r => (t - r.birth) * 300 < 400
+        r => (t - r.birth) * 200 < 600
       );
 
       animRef.current = requestAnimationFrame(animate);
