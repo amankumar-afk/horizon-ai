@@ -180,7 +180,7 @@ const ParticleNetwork = () => {
           const pulseT = (Math.sin(t * 1.5 + i * 0.03 + j * 0.02) + 1) * 0.5;
           const hasPulse = pulseT > 0.92;
 
-          const lineOpacity = (falloff * 0.1 + mouseBoost + (hasPulse ? 0.12 : 0)) * globalAlpha;
+          const lineOpacity = (falloff * 0.2 + mouseBoost + (hasPulse ? 0.15 : 0)) * globalAlpha;
 
           ctx.beginPath();
           ctx.moveTo(a.x, a.y);
