@@ -2,34 +2,6 @@ import ParticleNetwork from "@/components/ParticleNetwork";
 import LoginCard from "@/components/LoginCard";
 import logo from "@/assets/dotpe-horizon-logo.svg";
 
-const GhostChart = ({ delay, className }: { delay: string; className: string }) => (
-  <svg
-    className={`absolute opacity-0 ${className}`}
-    style={{ animation: `ghostFade 6s ease-in-out ${delay} infinite` }}
-    width="120"
-    height="50"
-    viewBox="0 0 120 50"
-  >
-    <polyline
-      fill="none"
-      stroke="rgba(210,48,48,0.1)"
-      strokeWidth="1.5"
-      points="0,40 20,35 40,25 60,30 80,15 100,20 120,10"
-    />
-  </svg>
-);
-
-const GhostPercentage = ({ value, delay, className }: { value: string; delay: string; className: string }) => (
-  <span
-    className={`absolute text-2xl font-bold ${className}`}
-    style={{
-      color: "rgba(210,48,48,0.08)",
-      animation: `ghostFade 8s ease-in-out ${delay} infinite`,
-    }}
-  >
-    {value}
-  </span>
-);
 
 const Index = () => {
   return (
