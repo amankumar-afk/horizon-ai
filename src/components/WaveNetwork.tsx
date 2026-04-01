@@ -28,135 +28,182 @@ const WaveNetwork = () => {
       mouseRef.current = { x: -9999, y: -9999 };
     };
 
+    // Data-inspired "pulse" nodes — like data points on a chart
+    const dataNodes: { x: number; y: number; phase: number; size: number; pulseSpeed: number }[] = [];
+    for (let i = 0; i < 40; i++) {
+      dataNodes.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        phase: Math.random() * Math.PI * 2,
+        size: 1.5 + Math.random() * 2.5,
+        pulseSpeed: 0.5 + Math.random() * 1.5,
+      });
+    }
+
     const animate = () => {
       const w = window.innerWidth;
       const h = window.innerHeight;
       ctx.clearRect(0, 0, w, h);
 
       const mouse = mouseRef.current;
-      timeRef.current += 0.006;
+      timeRef.current += 0.004;
       const t = timeRef.current;
+      const mouseRadius = 200;
 
-      const waveCount = 28;
-      const baseSpacing = h / (waveCount - 1);
-      const mouseRadius = 220;
-
-      for (let i = 0; i < waveCount; i++) {
-        const baseY = (i / (waveCount - 1)) * h;
+      // === LAYER 1: Flowing topology lines (like contour/heatmap lines) ===
+      const topoCount = 22;
+      for (let i = 0; i < topoCount; i++) {
+        const baseY = (i / (topoCount - 1)) * h;
+        const normalizedI = i / (topoCount - 1);
         
-        // Distance from edges — waves near top/bottom are bolder
-        const edgeFactor = 1 - Math.abs(i - waveCount / 2) / (waveCount / 2);
-        const edgeOpacity = 0.06 + (1 - edgeFactor) * 0.18;
-        const lineWidth = 0.6 + (1 - edgeFactor) * 1.2;
+        // Create organic clustering — denser at edges, breathing room in center
+        const edgeDist = Math.abs(normalizedI - 0.5) * 2; // 0 at center, 1 at edges
+        const lineAlpha = 0.03 + edgeDist * 0.12;
+        const lineWidth = 0.4 + edgeDist * 0.8;
 
-        // Each wave has a unique phase and frequency
-        const freq = 0.008 + Math.sin(i * 0.5) * 0.003;
-        const amp = 12 + Math.sin(i * 0.7 + t) * 8 + (1 - edgeFactor) * 15;
-        const phase = i * 0.6 + t * (0.8 + i * 0.05);
+        // Unique wave signature per line
+        const freq1 = 0.004 + Math.sin(i * 0.7) * 0.002;
+        const freq2 = freq1 * 2.618; // golden ratio harmonic
+        const amp = 18 + edgeDist * 25 + Math.sin(t * 0.3 + i * 0.5) * 6;
+        const phase = i * 0.4 + t * (0.5 + i * 0.02);
 
         ctx.beginPath();
+        for (let x = -10; x <= w + 10; x += 3) {
+          let y = baseY
+            + Math.sin(x * freq1 + phase) * amp
+            + Math.sin(x * freq2 + phase * 1.3 + i * 0.8) * amp * 0.25
+            + Math.cos(x * freq1 * 0.3 + t * 0.3) * amp * 0.15;
 
-        const step = 3;
-        for (let x = -10; x <= w + 10; x += step) {
-          // Base wave
-          let y = baseY +
-            Math.sin(x * freq + phase) * amp +
-            Math.sin(x * freq * 2.3 + phase * 1.4 + i) * amp * 0.3 +
-            Math.cos(x * freq * 0.5 + t * 0.5 + i * 0.3) * amp * 0.2;
-
-          // Mouse distortion — waves ripple away from cursor
+          // Mouse: gentle magnetic pull creating a "data lens" effect
           const dx = x - mouse.x;
           const dy = y - mouse.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < mouseRadius) {
-            const force = (mouseRadius - dist) / mouseRadius;
-            const pushAngle = Math.atan2(dy, dx);
-            const displacement = force * force * 50;
-            y += Math.sin(pushAngle) * displacement;
-            // Add ripple rings
-            y += Math.sin(dist * 0.08 - t * 4) * force * 12;
+            const force = 1 - dist / mouseRadius;
+            const smoothForce = force * force * (3 - 2 * force); // smoothstep
+            const angle = Math.atan2(dy, dx);
+            y += Math.sin(angle) * smoothForce * 40;
+            // Concentric ripple (like data waves emanating)
+            y += Math.sin(dist * 0.05 - t * 3) * smoothForce * 8;
           }
 
-          if (x === -10) {
-            ctx.moveTo(x, y);
-          } else {
-            ctx.lineTo(x, y);
-          }
+          if (x === -10) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
         }
 
-        // Determine if near mouse for glow boost
-        const waveMidDist = Math.abs(baseY - mouse.y);
-        const mouseGlow = waveMidDist < mouseRadius * 0.8
-          ? (1 - waveMidDist / (mouseRadius * 0.8)) * 0.35
-          : 0;
+        // Near-mouse glow
+        const waveDist = Math.abs(baseY - mouse.y);
+        const glow = waveDist < mouseRadius ? (1 - waveDist / mouseRadius) * 0.25 : 0;
 
-        const alpha = Math.min(edgeOpacity + mouseGlow, 0.55);
+        // Gradient color: warm red at edges → soft rose in center
+        const r = 210 - edgeDist * 30;
+        const g = 48 + (1 - edgeDist) * 40;
+        const b = 48 + (1 - edgeDist) * 50;
+        const alpha = Math.min(lineAlpha + glow, 0.45);
 
-        ctx.strokeStyle = `rgba(210, 48, 48, ${alpha})`;
-        ctx.lineWidth = lineWidth + mouseGlow * 2;
+        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        ctx.lineWidth = lineWidth + glow * 1.5;
         ctx.stroke();
+      }
 
-        // Draw dots at wave peaks near mouse
-        if (mouseGlow > 0.05) {
-          for (let x = 0; x < w; x += 40) {
-            let y = baseY +
-              Math.sin(x * freq + phase) * amp +
-              Math.sin(x * freq * 2.3 + phase * 1.4 + i) * amp * 0.3 +
-              Math.cos(x * freq * 0.5 + t * 0.5 + i * 0.3) * amp * 0.2;
+      // === LAYER 2: Meridian lines (vertical, like grid references) ===
+      const meridianCount = 8;
+      for (let i = 0; i < meridianCount; i++) {
+        const baseX = ((i + 0.5) / meridianCount) * w;
+        const edgeDist = Math.abs((i + 0.5) / meridianCount - 0.5) * 2;
+        const alpha = 0.015 + edgeDist * 0.04;
+        const freq = 0.006 + Math.cos(i * 1.1) * 0.002;
+        const amp = 6 + edgeDist * 12;
+        const phase = i * 1.2 + t * 0.4;
 
-            const dx = x - mouse.x;
-            const dy = y - mouse.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < mouseRadius) {
-              const force = (mouseRadius - dist) / mouseRadius;
-              y += Math.sin(Math.atan2(dy, dx)) * force * force * 50;
-              y += Math.sin(dist * 0.08 - t * 4) * force * 12;
+        ctx.beginPath();
+        for (let y = -10; y <= h + 10; y += 5) {
+          let x = baseX + Math.sin(y * freq + phase) * amp
+            + Math.cos(y * freq * 1.8 + phase * 0.6) * amp * 0.25;
 
+          const dx = x - mouse.x;
+          const dy = y - mouse.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < mouseRadius) {
+            const force = 1 - dist / mouseRadius;
+            x += Math.cos(Math.atan2(dy, dx)) * force * force * 25;
+          }
+
+          if (y === -10) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+
+        ctx.strokeStyle = `rgba(210, 60, 60, ${alpha})`;
+        ctx.lineWidth = 0.4;
+        ctx.stroke();
+      }
+
+      // === LAYER 3: Data pulse nodes — floating analytics dots ===
+      for (const node of dataNodes) {
+        const pulse = Math.sin(t * node.pulseSpeed + node.phase);
+        const size = node.size + pulse * 0.8;
+        const alpha = 0.06 + pulse * 0.04;
+
+        // Gentle float
+        const fx = node.x + Math.sin(t * 0.3 + node.phase) * 15;
+        const fy = node.y + Math.cos(t * 0.2 + node.phase * 1.3) * 10;
+
+        // Mouse proximity boost
+        const dx = fx - mouse.x;
+        const dy = fy - mouse.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const mouseBoost = dist < mouseRadius ? (1 - dist / mouseRadius) : 0;
+
+        const finalAlpha = Math.min(alpha + mouseBoost * 0.3, 0.5);
+        const finalSize = size + mouseBoost * 3;
+
+        // Outer glow
+        if (mouseBoost > 0.1) {
+          const gradient = ctx.createRadialGradient(fx, fy, 0, fx, fy, finalSize * 4);
+          gradient.addColorStop(0, `rgba(210, 48, 48, ${mouseBoost * 0.15})`);
+          gradient.addColorStop(1, `rgba(210, 48, 48, 0)`);
+          ctx.beginPath();
+          ctx.arc(fx, fy, finalSize * 4, 0, Math.PI * 2);
+          ctx.fillStyle = gradient;
+          ctx.fill();
+        }
+
+        // Core dot
+        ctx.beginPath();
+        ctx.arc(fx, fy, finalSize, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(210, 48, 48, ${finalAlpha})`;
+        ctx.fill();
+
+        // Connect nearby nodes near mouse
+        if (mouseBoost > 0.2) {
+          for (const other of dataNodes) {
+            if (other === node) continue;
+            const ox = other.x + Math.sin(t * 0.3 + other.phase) * 15;
+            const oy = other.y + Math.cos(t * 0.2 + other.phase * 1.3) * 10;
+            const nd = Math.sqrt((fx - ox) ** 2 + (fy - oy) ** 2);
+            if (nd < 150) {
               ctx.beginPath();
-              ctx.arc(x, y, 1.5 + force * 2, 0, Math.PI * 2);
-              ctx.fillStyle = `rgba(210, 48, 48, ${force * 0.5})`;
-              ctx.fill();
+              ctx.moveTo(fx, fy);
+              ctx.lineTo(ox, oy);
+              ctx.strokeStyle = `rgba(210, 48, 48, ${mouseBoost * 0.08 * (1 - nd / 150)})`;
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
             }
           }
         }
       }
 
-      // Vertical cross-waves (subtle, perpendicular energy)
-      const vWaveCount = 12;
-      for (let i = 0; i < vWaveCount; i++) {
-        const baseX = (i / (vWaveCount - 1)) * w;
-        const edgeFactor = 1 - Math.abs(i - vWaveCount / 2) / (vWaveCount / 2);
-        const alpha = 0.02 + (1 - edgeFactor) * 0.06;
-        const freq = 0.01 + Math.cos(i * 0.8) * 0.004;
-        const amp = 8 + (1 - edgeFactor) * 10;
-        const phase = i * 0.8 + t * 0.6;
-
-        ctx.beginPath();
-        for (let y = -10; y <= h + 10; y += 4) {
-          const x = baseX + Math.sin(y * freq + phase) * amp +
-            Math.cos(y * freq * 1.8 + phase * 0.7) * amp * 0.3;
-
-          const dx = x - mouse.x;
-          const dy = y - mouse.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          let fx = x;
-          if (dist < mouseRadius) {
-            const force = (mouseRadius - dist) / mouseRadius;
-            fx += Math.cos(Math.atan2(dy, dx)) * force * force * 30;
-          }
-
-          if (y === -10) ctx.moveTo(fx, y);
-          else ctx.lineTo(fx, y);
+      // === LAYER 4: Mouse focus ring — "analytical lens" ===
+      if (mouse.x > 0 && mouse.y > 0) {
+        for (let r = 0; r < 3; r++) {
+          const radius = 60 + r * 40 + Math.sin(t * 2 + r) * 5;
+          const alpha = 0.04 - r * 0.012;
+          ctx.beginPath();
+          ctx.arc(mouse.x, mouse.y, radius, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(210, 48, 48, ${alpha})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
         }
-
-        const waveMidDist = Math.abs(baseX - mouse.x);
-        const mouseGlow = waveMidDist < mouseRadius
-          ? (1 - waveMidDist / mouseRadius) * 0.12
-          : 0;
-
-        ctx.strokeStyle = `rgba(210, 48, 48, ${alpha + mouseGlow})`;
-        ctx.lineWidth = 0.5 + mouseGlow * 1.5;
-        ctx.stroke();
       }
 
       animRef.current = requestAnimationFrame(animate);
