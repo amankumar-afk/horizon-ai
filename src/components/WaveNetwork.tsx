@@ -67,10 +67,10 @@ const WaveNetwork = () => {
         smooth.y += (mouse.y - smooth.y) * 0.03;
       }
 
-      // 3D projection settings — terrain in lower portion
-      const horizonY = h * 0.35;
-      const focalLen = 280;
-      const cameraHeight = 70;
+      // 3D projection — terrain anchored to bottom edge, expanding upward
+      const horizonY = h * 0.15;
+      const focalLen = 250;
+      const cameraHeight = 80;
 
       for (let row = 0; row < ROWS; row++) {
         // Fade-in sweep: back rows appear first
