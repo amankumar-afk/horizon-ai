@@ -129,11 +129,11 @@ const WaveNetwork = () => {
         // Mouse proximity glow
         const rowDist = Math.abs(baseY - smooth.y);
         const glow = rowDist < mouseRadius
-          ? (1 - rowDist / mouseRadius) * 0.15
+          ? (1 - rowDist / mouseRadius) * 0.3
           : 0;
 
         ctx.strokeStyle = `rgba(200, 50, 50, ${baseAlpha + glow})`;
-        ctx.lineWidth = 0.4 + glow * 0.8;
+        ctx.lineWidth = 0.6 + glow * 1.5;
         ctx.stroke();
       }
 
