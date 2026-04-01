@@ -62,9 +62,9 @@ const WaveNetwork = () => {
       }
 
       // Camera: low angle looking across the terrain
-      const horizonY = h * 0.55; // horizon at ~55% from top
-      const focalLen = 300;
-      const cameraHeight = 80;
+      const horizonY = h * 0.25;
+      const focalLen = 250;
+      const cameraHeight = 90;
 
       for (let row = 0; row < ROWS; row++) {
         for (let col = 0; col < COLS; col++) {
@@ -120,12 +120,14 @@ const WaveNetwork = () => {
           const dotRadius = Math.max(0.4, 1.8 * scale * (1 + verticalNorm * 0.3));
           const alpha = depthNorm * (0.15 + verticalNorm * 0.55);
 
-          // White/light silver dots
-          const brightness = 180 + Math.round(verticalNorm * 60);
+          // Red dots
+          const r = 180 + Math.round(verticalNorm * 50);
+          const g = 30 + Math.round(verticalNorm * 15);
+          const b = 30 + Math.round(verticalNorm * 15);
 
           ctx.beginPath();
           ctx.arc(screenX, screenY, dotRadius, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${brightness},${brightness},${brightness + 10},${alpha})`;
+          ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
           ctx.fill();
         }
       }
