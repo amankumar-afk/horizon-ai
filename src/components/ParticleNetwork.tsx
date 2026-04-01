@@ -143,7 +143,7 @@ const ParticleNetwork = () => {
           ctx.beginPath();
           ctx.arc(n.x, n.y, drawRadius * 3, 0, Math.PI * 2);
           const glow = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, drawRadius * 3);
-          glow.addColorStop(0, `rgba(210, 48, 48, ${drawOpacity * 0.15})`);
+          glow.addColorStop(0, `rgba(210, 48, 48, ${drawOpacity * 0.25})`);
           glow.addColorStop(1, `rgba(210, 48, 48, 0)`);
           ctx.fillStyle = glow;
           ctx.fill();
