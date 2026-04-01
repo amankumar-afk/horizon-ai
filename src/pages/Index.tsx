@@ -22,11 +22,6 @@ const Index = () => {
       <div className="relative z-10 min-h-screen flex flex-col lg:flex-row items-center justify-center px-6 md:px-12 lg:px-20 gap-12 lg:gap-20">
         {/* Left: Branding */}
         <div className="flex-1 max-w-xl animate-slide-in-left relative">
-          {/* Ghost data visualizations */}
-          <GhostChart delay="0s" className="top-10 right-0" />
-          <GhostChart delay="3s" className="bottom-20 left-10" />
-          <GhostPercentage value="+24%" delay="1s" className="top-0 right-20" />
-          <GhostPercentage value="↑ 18%" delay="4s" className="bottom-10 right-5" />
 
           <img
             src={logo}
